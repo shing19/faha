@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p v-if="getImg==true">test</p>
     <section class="chat-box">
       <div class="chat-box-list-container" ref="chatbox">
         <ul class="chat-box-list">
@@ -9,10 +10,10 @@
             :key="idx"
             :class="message.author"
           >
-            <div>
-              <span>{{ message.text }}</span>
-              <img :id="idx" :src="message.img" v-show="!message.img == null" alt="image" style="width:5vw"/>
+            <div v-show="(message.img==null)">
+              <span v-show="!(message.text==null)">{{ message.text }}</span>
             </div>
+            <img :id="idx" :src="message.img" v-show="!(message.img==null)" alt="image" style="width:65%"/>
           </li>
         </ul> 
       </div>
@@ -40,7 +41,9 @@ export default {
     message: '',
     text: '',
     messages: [],
-    sender_id: ''
+    sender_id: '',
+    getImg: false,
+    filename: ''
   }),
   mounted() {
       this.sender_id = uuidv4()
@@ -112,19 +115,39 @@ export default {
       param.append('file',file) //通过append向form对象添加数据
       console.log(param.get('file')) //FormData私有类对象，访问不到，可以通过get判断值是否传进去
       this.$axios.post('http://1.117.208.226:8000/api/upload',param,{headers:{'Content-Type':'application/x-www-form-urlencoded' }}, ) //请求头要为表单
-        .then(response=>{
-          console.log(response.data)
-          let image_src = 'http://1.117.208.226:8000/static/images/' + response.data['filename']
+      .then(response=>{
+        console.log(response.data)
+        let image_src = 'http://1.117.208.226:8000/static/images/' + response.data['filename']
+        this.messages.push({
+          img: image_src,
+          author: 'client'
+        })
+        this.filename = response.data['filename']
+        console.log('client says: upload ')
+        console.log(this.filename)
+        this.$nextTick(() => {
+          this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight
+        })
+        this.text = 'upload_image: ' + this.filename 
+        this.$axios.post('http://1.117.208.226:5005/webhooks/rest/webhook', {
+          "message": this.text,
+          "sender": this.sender_id
+        })
+        .then(res => {
           this.messages.push({
-            img: image_src,
-            author: 'client'
+            text: res.data[0].text,
+            author: 'server'
           })
-          console.log('client says: upload ')
-          console.log(response.data['filename'])
+          console.log('server says: ')
+          console.log(res.data[0]['text'])
+          this.$nextTick(() => {
+            this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight
+          })
         })
-        .catch(function (error) {
-          console.log(error)
-        })
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     },
   }
 }
@@ -163,18 +186,29 @@ export default {
   color: white;  
 }
 .chat-box-list div {
+  display: flex;
+  width: auto;
+  height :auto;
   padding: 0.5rem;
   max-width: 80%;
+  min-width: 0;
 }
 .chat-box-list .server div{
   float: left;
   background: green;
   border-radius: 4px;
 }
+.chat-box-list .server img{
+  float:right;
+}
 .chat-box-list .client div{
   float: right;
+  flex-direction:row-reverse;
   background: blue;
   border-radius: 4px;
+}
+.chat-box-list .client img{
+  float:right;
 }
 .chat-inputs {
   display: flex;

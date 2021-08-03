@@ -28,11 +28,11 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
 app.config['PICTURE_PATH'] = PICTURE_PATH
-app.add_url_rule('/uploads/<filename>', 'uploaded_file',
-                 build_only=True)
-app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-    '/uploads':  app.config['PICTURE_PATH']
-})
+# app.add_url_rule('/uploads/<filename>', 'uploaded_file',
+#                  build_only=True)
+# app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+#     '/uploads':  app.config['PICTURE_PATH']
+# })
 
 
 @app.route('/api/random')
@@ -50,7 +50,8 @@ def upload():
             ext = CHANGE_EXTENSIONS[ext]
             md5 = hashlib.md5(img.read()).hexdigest()
             filename = md5 + '.' + ext
-            directory = os.path.join(PICTURE_PATH, filename)
+            img_folder = 'dist/static/images'
+            directory = os.path.join(img_folder, filename)
             if not os.path.isfile(directory):
                 img.seek(0)
                 img.save(directory)
