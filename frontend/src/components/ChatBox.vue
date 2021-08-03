@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p v-if="getImg==true">test</p>
     <section class="chat-box">
       <div class="chat-box-list-container" ref="chatbox">
         <ul class="chat-box-list">
@@ -10,10 +9,10 @@
             :key="idx"
             :class="message.author"
           >
-            <div v-show="(message.img==null)">
+            <div v-show="(message.image==null)">
               <span v-show="!(message.text==null)">{{ message.text }}</span>
             </div>
-            <img :id="idx" :src="message.img" v-show="!(message.img==null)" alt="image" style="width:65%"/>
+            <img :id="idx" :src="message.image" v-show="!(message.image==null)" alt="image" style="width:65%"/>
           </li>
         </ul> 
       </div>
@@ -42,7 +41,6 @@ export default {
     text: '',
     messages: [],
     sender_id: '',
-    getImg: false,
     filename: ''
   }),
   mounted() {
@@ -79,6 +77,7 @@ export default {
         .then(res => {
           this.messages.push({
             text: res.data[0].text,
+            image: res.data[0].image,
             author: 'server'
           })
           console.log('server says: ')
@@ -119,7 +118,7 @@ export default {
         console.log(response.data)
         let image_src = 'http://1.117.208.226:8000/static/images/' + response.data['filename']
         this.messages.push({
-          img: image_src,
+          image: image_src,
           author: 'client'
         })
         this.filename = response.data['filename']
@@ -136,6 +135,7 @@ export default {
         .then(res => {
           this.messages.push({
             text: res.data[0].text,
+            image: res.data[0].image,
             author: 'server'
           })
           console.log('server says: ')
