@@ -111,10 +111,10 @@ export default {
       let param = new FormData() //创建form对象
       param.append('file',file) //通过append向form对象添加数据
       console.log(param.get('file')) //FormData私有类对象，访问不到，可以通过get判断值是否传进去
-      this.$axios.post('http://1.117.208.226:5000/api/upload',param,{headers:{'Content-Type':'application/x-www-form-urlencoded' }}, ) //请求头要为表单
+      this.$axios.post('http://1.117.208.226:8000/api/upload',param,{headers:{'Content-Type':'application/x-www-form-urlencoded' }}, ) //请求头要为表单
         .then(response=>{
           console.log(response.data)
-          let image_src = 'http://1.117.208.226:5000/static/images/' + response.data['filename']
+          let image_src = 'http://1.117.208.226:8000/static/images/' + response.data['filename']
           this.messages.push({
             img: image_src,
             author: 'client'
