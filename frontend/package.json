@@ -11,6 +11,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "live2d-widget": "^3.1.4",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
