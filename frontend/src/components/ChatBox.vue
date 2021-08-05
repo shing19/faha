@@ -108,11 +108,30 @@ export default {
           "sender": this.sender_id
         }, {timeout: 1000 * 60 * 4})
         .then(res => {
-          this.messages.push({
-            text: res.data[0].text,
-            image: res.data[0].image,
-            author: 'server'
-          })
+          let msgtext = res.data[0].text
+          console.log('text: ' + msgtext)
+          if ( msgtext.search('//image//') != -1 ) {
+            this.messages.push({
+              text: msgtext.split('//image//')[0],
+              // image: msgtext.split('//image//')[1],
+              // image: res.data[0].image,
+              author: 'server'
+            })
+            this.messages.push({
+              // text: msgtext.split('//image//')[0],
+              image: msgtext.split('//image//')[1],
+              // image: res.data[0].image,
+              author: 'server'
+            })
+          }
+          else {
+            this.messages.push({
+              text: msgtext,
+              image: res.data[0].image,
+              author: 'server'
+            })
+
+          }
           console.log('server says: ')
           console.log(res.data[0])
           this.$nextTick(() => {
@@ -306,7 +325,7 @@ export default {
   border-radius: 4px;
 }
 .chat-box-list .server img{
-  float:right;
+  float:left;
 }
 .chat-box-list .client div{
   float: right;
