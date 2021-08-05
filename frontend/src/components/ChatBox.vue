@@ -108,6 +108,7 @@ export default {
           "sender": this.sender_id
         }, {timeout: 1000 * 60 * 4})
         .then(res => {
+          // split starts here
           let msgtext = res.data[0].text
           console.log('text: ' + msgtext)
           if ( msgtext.search('//image//') != -1 ) {
@@ -125,6 +126,7 @@ export default {
             })
           }
           else {
+          // split overs here
             this.messages.push({
               text: msgtext,
               image: res.data[0].image,
