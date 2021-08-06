@@ -16,7 +16,8 @@
             :class="message.author"
           >
             <div v-show="(message.image==null)">
-              <span v-show="!(message.text==null)">{{ message.text }}</span>
+              <!-- <span v-show="!(message.text==null)">{{ message.text }}</span> -->
+              <span>{{ message.text }}</span>
             </div>
             <img :id="idx" :src="message.image" v-show="!(message.image==null)" alt="image" style="width:65%" @load="scroll"/>
           </li>
@@ -125,6 +126,66 @@ export default {
               author: 'server'
             })
           }
+          else if ( msgtext.search('正在生成中，请稍等') != -1) {
+            let genText = this.text
+            this.messages.push({
+              text: msgtext,
+              // image: res.data[0].image,
+              author: 'server'
+            })
+            let param = new FormData()
+            param.append('input_text', genText)
+            this.$axios.post('http://1.117.208.226:8000/api/generate', param, {headers:{'Content-Type':'application/x-www-form-urlencoded' }}, {timeout: 1000 * 60 * 4})
+            .then(resGen => {
+              // console.log(genText)
+              console.log(resGen.data)
+              this.messages.push({
+                text: resGen.data.text,
+                // image: resGen.data.image,
+                author: 'server'
+              })
+              this.messages.push({
+                // text: resGen.data.text,
+                image: resGen.data.image,
+                author: 'server'
+              })
+              this.filename = resGen.data.image.split('/images/')[1]
+              this.$axios.post('http://1.117.208.226:5005/webhooks/rest/webhook', {
+                "message": this.filename,
+                "sender": this.sender_id
+              })
+              .then(res => {
+                console.log(res.data)
+              })
+            })
+          }
+          else if ( msgtext.search('正在修改中，请稍等') != -1) {
+            let modText = this.text
+            this.messages.push({
+              text: msgtext,
+              // image: res.data[0].image,
+              author: 'server'
+            })
+            let param = new FormData()
+            param.append('text', modText)
+            param.append('image', this.filename)
+            this.$axios.post('http://1.117.208.226:8000/api/modify', param, {headers:{'Content-Type':'application/x-www-form-urlencoded' }}, {timeout: 1000 * 60 * 4})
+            .then(resMod => {
+              // console.log(modText)
+              console.log(resMod.data)
+              this.messages.push({
+                text: resMod.data.text,
+                // image: resMod.data.image,
+                author: 'server'
+              })
+              this.messages.push({
+                // text: resMod.data.text,
+                image: resMod.data.image,
+                author: 'server'
+              })
+              this.filename = resMod.data.image.split('/images/')[1]
+            })
+          }
           else {
           // split overs here
             this.messages.push({
@@ -169,7 +230,7 @@ export default {
       let param = new FormData() //创建form对象
       param.append('file',file) //通过append向form对象添加数据
       console.log(param.get('file')) //FormData私有类对象，访问不到，可以通过get判断值是否传进去
-      this.$axios.post('http://1.117.208.226:8000/api/upload',param,{headers:{'Content-Type':'application/x-www-form-urlencoded' }}, {timeout: 1000 * 60 * 4} ) //请求头要为表单
+      this.$axios.post('http://1.117.208.226:8000/api/upload', param, {headers:{'Content-Type':'application/x-www-form-urlencoded' }}, {timeout: 1000 * 60 * 4} ) //请求头要为表单
       .then(response=>{
         console.log(response.data)
         let image_src = 'http://1.117.208.226:8000/static/images/' + response.data['filename']
