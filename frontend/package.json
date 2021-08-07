@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "live2d-widget": "^3.1.4",
+    "live2d-widget-model-haru": "^1.0.5",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

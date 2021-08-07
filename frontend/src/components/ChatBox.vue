@@ -84,8 +84,32 @@ export default {
       this.$el.appendChild(script);
       document.addEventListener('CABLES.jsLoaded',  event => {
         console.log('cables loaded')
-        setTimeout(() =>{ this.init() },1500);
+        setTimeout(() =>{ this.init() },10);
       })
+      // say hi
+      setTimeout(() => {
+        console.log('say hi 2')
+        this.message = 'hi'
+        console.log(this.message)
+        this.text = this.message
+        this.message = ''
+        this.messages.push({
+          text: this.text,
+          author: 'client'
+        })
+        console.log('client says: ')
+        console.log(this.text)
+        this.$axios.post('http://1.117.208.226:5005/webhooks/rest/webhook', {
+          "message": this.text,
+          "sender": this.sender_id
+        })
+        .then(res => {
+          this.messages.push({
+            text: res.data[0].text,
+            author: 'server'
+          })
+        })
+      }, 1500)
 		},
   methods: {
     sendMessage() {
@@ -184,6 +208,30 @@ export default {
                 author: 'server'
               })
               this.filename = resMod.data.image.split('/images/')[1]
+            })
+          }
+          else if ( msgtext.search('正在随机生成中，请稍等') != -1) {
+            let ranText = this.text
+            this.messages.push({
+              text: msgtext,
+              // image: res.data[0].image,
+              author: 'server'
+            })
+            this.$axios.post('http://1.117.208.226:8000/api/generate_random', {timeout: 1000 * 60 * 4})
+            .then(resRan => {
+              // console.log(modText)
+              console.log(resRan.data)
+              this.messages.push({
+                text: resRan.data.text,
+                // image: resMod.data.image,
+                author: 'server'
+              })
+              this.messages.push({
+                // text: resMod.data.text,
+                image: resRan.data.image,
+                author: 'server'
+              })
+              this.filename = resRan.data.image.split('/images/')[1]
             })
           }
           else {
@@ -309,25 +357,16 @@ export default {
       setTimeout(function () {
           L2Dwidget.init({
               model: {
-                jsonPath: 'https://cdn.jsdelivr.net/gh/wangsrGit119/wangsr-image-bucket/L2Dwidget/live2d-widget-model-miku/assets/miku.model.json',
-                scale: 1.5
-              },
-              dialog: {
-                  // 开启对话框
-                  enable: true,
-                  script: {
-                      // 当触摸到角色身体
-                      'tap body': '哎呀！别碰我！',
-                      // 当触摸到角色头部
-                      'tap face': '人家是在认真写博客哦--前端妹子',
-                  }
+                jsonPath: 'https://cdn.jsdelivr.net/gh/wangsrGit119/wangsr-image-bucket/L2Dwidget/live2d-widget-model-haru/01/assets/haru01.model.json',
+                // jsonPath: 'live2d-widget-models-master/packages/live2d-widget-model-haru/01/assets/haru01.model.json',
+                scale: 1.3
               },
               display: {
                 position: 'left',
-                width: 300,
-                height: 600,
-                hOffset: 30,
-                vOffset: 100,
+                width: 250,
+                height: 500,
+                hOffset: 80,
+                vOffset: 180,
               },
           })
       },1000)
@@ -425,7 +464,7 @@ export default {
 .restart {
   position: absolute;
   left: 20.7%;
-  top: 22.35%;
+  top: 25.35%;
   margin: 0;
 }
 .file {
