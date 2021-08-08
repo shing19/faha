@@ -157,6 +157,10 @@ export default {
               // image: res.data[0].image,
               author: 'server'
             })
+            this.messages.push({
+              text: '预计需要1分钟',
+              author: 'server'
+            })
             let param = new FormData()
             param.append('input_text', genText)
             this.$axios.post('http://1.117.208.226:8000/api/generate', param, {headers:{'Content-Type':'application/x-www-form-urlencoded' }}, {timeout: 1000 * 60 * 4})
@@ -188,6 +192,10 @@ export default {
             this.messages.push({
               text: msgtext,
               // image: res.data[0].image,
+              author: 'server'
+            })
+            this.messages.push({
+              text: '预计需要1分钟',
               author: 'server'
             })
             let param = new FormData()
